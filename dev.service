@@ -1,0 +1,15 @@
+[Unit]
+Description=Gunicorn instance to serve the dev application
+After=network.target
+
+[Service]
+User=dev
+Group=www-data
+PIDFile=/tmp/gunicorn.pid
+WorkingDirectory=/home/dev/dev/http/
+ExecStart=/usr/bin/gunicorn3 server:App --name app1 --bind 0.0.0.0:8001 --worker-class aiohttp.worker.GunicornWebWorker --access-logfile /tmp/access-gunicorn.log --error-logfile /tmp/error-gunicor.log --capture-output --reload
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+
+[Install]
+WantedBy=multi-user.target

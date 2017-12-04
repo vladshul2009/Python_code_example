@@ -1,0 +1,1 @@
+CUR_APP_NAME = ''

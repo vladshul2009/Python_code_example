@@ -1,0 +1,7 @@
+How to start server:
+gunicorn server:App --bind localhost:8001 --worker-class aiohttp.worker.GunicornWebWorker
+
+all API based controllers must inherit BaseController NOT CoreController
+please DO NOT override reserved CoreController methods: "get", "post", "input", "setStatus", "getStatus", "makeResponse", "setPostParams", "setGetParams"
+
+swagger github: https://github.com/cr0hn/aiohttp-swagger

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sockets description</title>
+    <style>
+        h4 {
+            color: blue;
+        }
+        b {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+<h4><a href="/api/v1/doc">< Http description</a></h4>
+    <h3>Commands:</h3>
+    <ul>
+        <li>authorize</li>
+        <li>message</li>
+        <li>update_message</li>
+        <li>unread_messages</li>
+        <li>create_chat_room</li>
+        <li>del_chat_room</li>
+        <li>add_user_to_chat</li>
+        <li>del_user_from_chat</li>
+        <li>------------------</li>
+        <li>create_board</li>
+        <li>update_board</li>
+        <li>delete_board</li>
+        <li>get_board</li>
+        <li>get_boards</li>
+        <li>create_board_list</li>
+        <li>update_board_list</li>
+        <li>delete_board_list</li>
+        <li>create_card</li>
+        <li>update_card</li>
+        <li>delete_card</li>
+        <li>add_card_files</li>
+        <li>add_card_comment</li>
+        <li>add_card_assigners</li>
+        <li>delete_card_comment</li>
+        <li>del_card_assigners</li>
+        <li>add_comment_files</li>
+        <li>move_board_list</li>
+        <li>move_card</li>
+        <li>add_board_users</li>
+        <li>delete_board_users</li>
+
+    </ul>
+    <h4>1. authorize</h4>
+        <p>
+            <b>request</b>: {"command": "authorize", "data": {"api_token": "xxx"}}
+        </p>
+        <p>
+            <b>response ok</b>:
+            <p>{"command": "authorized", "data": {"value": true}}</p>
+            <p>{"data": {"count_unread": "3"}, "command": "new_messages"}</p>
+        </p>
+        <p>
+            <b>response failed</b>: {"command": "do_login", "data": {}}
+        </p>
+    <h4>2. message</h4>
+        <p>one of params "id_to_user", "id_to_chat" is required.</p>
+        <p>param "kind" possible values: "text", "image", "doc"</p>
+        <p>
+            <b>request</b>: {"command": "message", "data": {"id_to_user": "12345", "message": "hello!", "kind": "text"}}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "message_sent", "data": {"ident": "63488", "created_at": "1485961280", "user_id": "46", "message": "hello!", "is_owner": true, "kind": "text", "is_updated": true}}
+        </p>
+        <p>
+            <b>response receiver</b>: {"data": {"id_from": "60", "ident": "62979", "kind": "text", "created_at": "1485439744", "is_updated": false, "message": "hello!"}, "command": "receive_message"}
+        </p>
+    <h4>3. unread_messages</h4>
+        <p>param limit is 20 by default and not required</p>
+        <p>
+            <b>request</b>: {"command": "unread_messages", "data": {"limit": 40}}
+        </p>
+        <p>
+            <b>response ok</b>:
+            <p>{"data": {"id_from": "60", "ident": "62978", "kind": "text", "created_at": "1485439635", "is_updated": false, "message": "hello!"}, "command": "receive_message"}</p>
+            <p>...</p>
+            <p>N</p>
+            <p>{"data": {"count_unread": "3"}, "command": "new_messages"}</p>
+        </p>
+    <h4>4. update_message</h4>
+        <p>updates already sent message</p>
+        <p>
+           <b>request</b>: {"data": {"message": "new message text", "message_id": "12345"}, "command": "update_message"}
+        </p>
+        <p>
+            <b>response ok</b>: {"data": {"ident": "62978", "kind": "text", "created_at": "1485439635", "is_updated": true, "message": "new message text", "id_to_user": "17"}, "command": "message_updated"}
+        </p>
+        <p>
+            <b>response receiver</b>: {"data": {"id_from": "60", "ident": "62979", "kind": "text", "created_at": "1485439744", "is_updated": true, "message": "hello!"}, "command": "update_message"}
+        </p>
+        --------------------------------------------------------------------------------------------------
+        --------------------------------------------------------------------------------------------------
+        --------------------------------------------------------------------------------------------------
+    <h4>1. create_board</h4>
+        <p>create new board</p>
+        <p>
+           <b>request</b>: {"data": {"name": "new board name"}, "command": "create_board"}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "board_created", "data": {"ident": "5", "name": "test 1234", "attributes": {}}}
+        </p>
+    <h4>2. update_board</h4>
+        <p>update board name, only owner can</p>
+        <p>
+           <b>request</b>: {"data": {"name": "new name", "board_id": "123"}, "command": "update_board"}
+        </p>
+        <p>
+            <b>response ok</b>: {"data": {"ident": "1", "attributes": {}, "name": "new name"}, "command": "board_updated"}
+        </p>
+    <h4>3. delete_board</h4>
+        <p>delete board, only owner can</p>
+        <p>
+           <b>request</b>: {"data": {"board_id": "123"}, "command": "delete_board"}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "board_deleted", "data": {}}
+        </p>
+    <h4>4. get_board</h4>
+        <p>get board data (board lists)</p>
+        <p>
+           <b>request</b>: {"data": {"board_id": "123"}, "command": "get_board"}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "board_found", "data": {"board": {"lists": [{"cards": [{"files": [{"ident": "1", "file": "http://46.101.254.89/static/uploads/7ffc2f2e-2809-41f9-99b7-77b8d288d23e.jpeg"}, {"ident": "2", "file": "http://46.101.254.89/static/uploads/f38aea53-0891-4e1c-978e-b2e2ccba79ee.jpeg"}], "color": "CCCCCC", "ident": "11", "name": "card 1", "board_list_id": "15"}, {"files": [], "color": "FFFFFF", "ident": "13", "name": "card 3", "board_list_id": "15"}], "ident": "52", "name": "two"}, {"cards": [{"files": [], "color": "CCCCCC", "ident": "12", "name": "card 2", "board_list_id": "15"}, {"files": [], "color": "CCCCCC", "ident": "14", "name": "card 4", "board_list_id": "15"}], "ident": "51", "name": "one"}, {"cards": [], "ident": "53", "name": "three"}], "ident": "1", "name": "new board name"}}}
+        </p>
+    <h4>5. get_boards</h4>
+        <p>get list of user's boards</p>
+        <p>
+           <b>request</b>: {"command": "get_boards"}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "boards_list", "data": {"boards": [{"cards_deadline_count": "2", "board": {"ident": "1", "name": "new board name"}, "cards_count": "4"}]}}
+        </p>
+    <h4>6. create_board_list</h4>
+        <p>add new list to already existing board, only board owner can</p>
+        <p>
+           <b>request</b>: {"data": {"name": "list name", "board_id": "123"}, "command": "create_board_list"}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "board_list_created", "data": {"ident": "52"}}
+        </p>
+    <h4>7. update_board_list</h4>
+        <p>update board list name, only owner can</p>
+        <p>
+           <b>request</b>: {"data": {"name": "new list name", "list_id": "123"}, "command": "update_board_list"}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "board_list_updated", "data": {}}
+        </p>
+    <h4>8. delete_board_list</h4>
+        <p>delete board list, only owner can</p>
+        <p>
+           <b>request</b>: {"data": {"list_id": "123"}, "command": "delete_board_list"}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "board_list_deleted", "data": {}}
+        </p>
+    <h4>9. create_card</h4>
+        <p>Add new card to already existing board list. Required params: list_id, name.</p>
+        <p>
+           <b>request</b>: {"data": {"name": "card name", "list_id": "123", "color": "0000FF", "description": "card description", "deadline": "2017-02-15"}, "command": "create_card"}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "card_created", "data": {"ident": "123", "board_list_id": "15"}}
+        </p>
+    <h4>10. update_card</h4>
+        <p>Only card_id is required.</p>
+        <p>
+           <b>request</b>: {"data": {"name": "card name", "card_id": "123", "color": "0000FF", "description": "card description", "board_list_id": "15"}, "command": "update_card"}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "card_updated", "data": {"ident": "123"}}
+        </p>
+    <h4>11. delete_card</h4>
+        <p>Delete card, any user related to board can.</p>
+        <p>
+           <b>request</b>: {"data": {"card_id": "123"}, "command": "delete_card"}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "card_deleted", "data": {}}
+        </p>
+    <h4>12. add_card_comment</h4>
+        <p>Add comment to card.</p>
+        <p>
+           <b>request</b>: {"command": "add_card_comment", "data": {"card_id": "11", "comment": "test comment"}}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "card_commented", "data": {"card_comment": {"comment": "test comment", "card_id": "11", "created_at": "1485882437", "ident": "3", "author_id": "60"}}}
+        </p>
+    <h4>13. add_card_assigners</h4>
+        <p>Add assigners to the card.</p>
+        <p>Only users from the card's board(or board owner) can do this.</p>
+        <p>
+           <b>request</b>: {"command": "add_card_assigners", "data": {"card_id": "13", "assigner_ids": [18,19,20]}}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "card_assigners_added", "data": {"assigners": ["18", "19", "20"], "card": {"color": "FFFFFF", "name": "card 3", "files": [], "ident": "13", "board_list_id": "15"}}}
+        </p>
+    <h4>14. delete_card_comment</h4>
+        <p>Add comment to card.</p>
+        <p>
+           <b>request</b>: {"command": "delete_card_comment", "data": {"comment_id": "123"}}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "comment_deleted", "data": {}}}
+        </p>
+    <h4>15. del_card_assigners</h4>
+        <p>Delete assigners from the card.</p>
+        <p>Only board owner can do this.</p>
+        <p>
+           <b>request</b>: {"command": "del_card_assigners", "data": {"card_id": "13", "assigner_ids": [18,19]}}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "card_assigners_deleted", "data": {"assigners": [20], "card": {"color": "FFFFFF", "name": "card 3", "files": [], "ident": "13", "board_list_id": "15"}}}
+        </p>
+    <h4>16. add_comment_files</h4>
+        <p>Add files to card comment.</p>
+        <p>
+           <b>request</b>: {"command": "add_comment_files", "data": {"comment_id": "1", "file_urls": ["http://46.101.254.89/static/uploads/f58d9870-a709-450c-8c61-e292499e0201.jpeg"]}}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "comment_file_added", "data": {"comment": {"comment": "test comment", "ident": "1", "created_at": "1485882352", "files": [{"ident": "3", "file": "http://46.101.254.89http://46.101.254.89/static/uploads/f58d9870-a709-450c-8c61-e292499e0201.jpeg"}], "author_id": "60"}}}
+        </p>
+    <h4>17. add_card_files</h4>
+        <p>Add files to the card.</p>
+        <p>You need upload files using /api/v1/upload/send first.</p>
+        <p>
+           <b>request</b>: {"command": "add_card_files", "data": {"card_id": "11", "file_urls": ["http://46.101.254.89/static/uploads/7ffc2f2e-2809-41f9-99b7-77b8d288d23e.jpeg", "http://46.101.254.89/static/uploads/f38aea53-0891-4e1c-978e-b2e2ccba79ee.jpeg"]}}
+        </p>
+        <p>
+            <b>response ok</b>: {"card": {"files": [{"ident": "1", "file": "http://46.101.254.89/static/uploads/7ffc2f2e-2809-41f9-99b7-77b8d288d23e.jpeg"}, {"ident": "2", "file": "http://46.101.254.89/static/uploads/f38aea53-0891-4e1c-978e-b2e2ccba79ee.jpeg"}], "color": "CCCCCC", "ident": "11", "name": "card 1"}}}
+        </p>
+    <h4>18. move_board_list</h4>
+        <p>Change board list order. Move element to N(param "pos") position.</p>
+        <p>
+           <b>request</b>: {"data": {"list_id": "123", "pos": "5"}, "command": "move_board_list"}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "board_list_moved", "data": {}}
+        </p>
+    <h4>19 move_card</h4>
+        <p>Change cards order. Move element to N(param "pos") position.</p>
+        <p>Param list_id is NOT required, use it when you need to change card list.</p>
+        <p>Order begins from 0.</p>
+        <p>
+           <b>request</b>: {"data": {"card_id": "123", "pos": "5", "list_id": "15"}, "command": "move_card"}
+        </p>
+        <p>
+            <b>response ok</b>: {"data": {"cards_order": ["12", "17", "14"], "list_id": "57"}, "command": "card_moved"}
+        </p>
+    <h4>20. add_board_users</h4>
+        <p>Add users to board, only board owner can.</p>
+        <p>
+           <b>request</b>: {"command": "add_board_users", "data": {"board_id": 1, "user_ids": [17, 18, 19]}}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "users_added", "data": {"user_ids": ["17", "18", "19"]}}
+        </p>
+    <h4>21. delete_board_users</h4>
+        <p>Delete users from board, only board owner can.</p>
+        <p>If user_ids is empty - deletes user from board, who sent the request.</p>
+        <p>
+           <b>request</b>: {"command": "delete_board_users", "data": {"board_id": 1, "user_ids": [17, 18, 19]}}
+        </p>
+        <p>
+            <b>response ok</b>: {"command": "board_users_deleted", "data": {}}
+        </p>
+
+    <h3>Events History</h3>
+        <h4>Messages received by users via sockets when some event happens:</h4>
+
+        <p>{"command": "board_updated", "data": {"board": {"id": 1, "name": "new name123"}, "message": "User 60 updated board new name123"}}</p>
+
+        <p>{"command": "board_deleted", "data": {"message": "User 60 deleted board new name321"}}</p>
+
+        <p>{"command": "board_list_created", "data": {"message": "User 60 created board listlist name 2"}}</p>
+
+        <p>{"command": "board_list_updated", "data": {"message": "User 60 updated board list new list name59"}}</p>
+
+        <p>{"command": "board_list_deleted", "data": {"message": "User 60 deleted board list new list name59"}}</p>
+
+        <p>{"command": "card_created", "data": {"card": {"id": 17, "color": "0000FF", "name": "card name", "files": [], "board_list_id": "15"}, "message": "User 60 created card: card name"}}</p>
+
+        <p>{"command": "card_updated", "data": {"card": {"id": 17, "color": "00FF00", "name": "card name", "files": [], "board_list_id": "15"}, "message": "User 60 created card: card name"}}</p>
+
+        <p>{"command": "card_moved", "data": {"card": {"id": 17, "color": "00FF00", "name": "card name", "files": [], "board_list_id": "15"}, "message": "User 60 moved card to another position: card name"}}</p>
+
+        <p>{"command": "card_deleted", "data": {"message": "User 60 deleted card: card name"}}</p>
+
+        <p>{"command": "card_comment_added", "data": {"message": "User 60 commented card: card 1"}}</p>
+
+        <p>{"command": "card_comment_deleted", "data": {"message": "User 60 deleted card: card 1"}}</p>
+
+</body>
+</html>

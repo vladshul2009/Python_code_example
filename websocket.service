@@ -1,0 +1,15 @@
+[Unit]
+Description=Gunicorn instance to serve the websocket
+After=network.target
+
+[Service]
+User=dev
+Group=www-data
+PIDFile=/tmp/gunicorn-ws.pid
+WorkingDirectory=/home/dev/dev/http/
+ExecStart=/usr/bin/gunicorn3 websocket:app --bind 127.0.0.1:8080 --worker-class aiohttp.worker.GunicornWebWorker --access-logfile /tmp/access-gunicorn-ws.log --error-logfile /tmp/error-gunicor-ws.log --capture-output --reload
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+
+[Install]
+WantedBy=multi-user.target

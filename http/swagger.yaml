@@ -1,0 +1,689 @@
+# this is an example of the Uber API
+# as a demonstration of an API spec in YAML
+swagger: "2.0"
+info:
+  title: API
+  description: API description for mobile developers <a href="/static/sockets.html">Sockets description</a>
+  version: "1.0.0"
+# the domain of the service
+host: 46.101.254.89
+# will be prefixed to all paths
+basePath: /
+securityDefinitions:
+  apikey:
+    type: apiKey
+    name: server_token
+    in: query
+consumes:
+  - application/x-www-form-urlencoded
+produces:
+  - application/json
+paths:
+  /api/v1/user/signup:
+    post:
+      summary: Create new user
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"email":"test@test.com", "password": "123"}'
+        - name: email
+          in: query
+          type: string
+          description: 'required'
+        - name: password
+          in: query
+          type: string
+          description: 'required'
+        - name: first_name
+          in: query
+          type: string
+        - name: last_name
+          in: query
+          type: string
+      tags:
+        - User
+      responses:
+        "200":
+          description: api token of the user
+          schema:
+            $ref: '#/definitions/UserData'
+  /api/v1/user/update_profile:
+    post:
+      summary: Update user profile
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"api_token": "xxx", "old_password": "123", "new_password": "321", "email": "abc@aa.com", "name": "fname lname"}'
+        - name: api_token
+          in: query
+          type: string
+          description: required
+        - name: email
+          in: query
+          type: string
+        - name: old_password
+          in: query
+          type: string
+        - name: new_password
+          in: query
+          type: string
+        - name: first_name
+          in: query
+          type: string
+        - name: last_name
+          in: query
+          type: string
+        - name: photo
+          in: query
+          type: string
+          description: upload photo first, using api/v1/upload/send
+        - name: name
+          in: query
+          type: string
+          description: first_name and last_name delimited by space
+      tags:
+        - User
+      responses:
+        "200":
+          description: api token of the user
+          schema:
+            $ref: '#/definitions/UserData'
+  /api/v1/user/login:
+    post:
+      summary: User Login
+      description: user login using email and password
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"email":"test@test.com", "password": "123"}'
+        - name: email
+          in: query
+          type: string
+          description: 'required'
+        - name: password
+          in: query
+          type: string
+          description: 'required'
+      tags:
+        - User
+      responses:
+        "200":
+          description: api token of the user
+          schema:
+            $ref: '#/definitions/UserData'
+  /api/v1/user/reset_password:
+    post:
+      summary: Request for password reset
+      description: restore user password. To use application restore please send "Application-Name" header
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"email":"test@test.com"}'
+        - name: email
+          in: query
+          type: string
+          description: 'required'
+      tags:
+        - User
+      responses:
+        "200":
+          schema: '{}'
+  /api/v1/user/new_password:
+    post:
+      summary: Change password using API
+      description: request for changing password in database
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"password": "q1w3"}'
+        - name: reset_token
+          in: query
+          type: string
+          description: 'required (in url as get parameter)'
+        - name: password
+          in: query
+          type: string
+          description: 'required'
+      tags:
+        - User
+      responses:
+        "200":
+          schema: '{}'
+  /api/v1/user/login_social:
+    post:
+      summary: User login using social network
+      description: user login using oauth2 token
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"social_alias":"facebook", "token": "sFGb8Gasfgelgew", "is_agree": true}'
+        - name: social_alias
+          in: query
+          type: string
+          description: 'required'
+        - name: token
+          in: query
+          type: string
+          description: 'required'
+        - name: secret
+          in: query
+          type: string
+        - name: is_agree
+          in: query
+          type: string
+          description: ''
+        - name: username
+          in: query
+          type: string
+          description: 'requred for twitter instead of token'
+      tags:
+        - User
+      responses:
+        "200":
+          description: api token of the user
+          schema:
+            $ref: '#/definitions/UserData'
+  /api/v1/user/find_users:
+    post:
+      summary: Get list of users
+      description:
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"api_token":"sFGb8Gasfgelgew", "offset": "0" "limit": "20", "term": "Vasia Pupkin test@test.com"}'
+        - name: api_token
+          in: query
+          type: string
+          description: 'required'
+        - name: offset
+          in: query
+          type: string
+        - name: limit
+          in: query
+          type: string
+        - name: term
+          in: query
+          type: string
+      tags:
+        - User
+      responses:
+        "200":
+          description: api token of the user
+          schema:
+            $ref: '#/definitions/UserContacts'
+  /api/v1/user/add_contact:
+    post:
+      summary: Add user
+      description: Add user to contact list
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"api_token": "xxx", "user_id": [15,25,31]}'
+        - name: api_token
+          in: query
+          type: string
+          description: 'required'
+        - name: user_id
+          in: query
+          type: string
+          description: 'required (int or array)'
+      tags:
+        - User
+      responses:
+        "200":
+          schema: '{}'
+  /api/v1/user/delete_contact:
+    post:
+      summary: Delete user
+      description: Delete user from the contact list
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"api_token": "xxx", "user_id": [15,25,31]}'
+        - name: api_token
+          in: query
+          type: string
+          description: 'required'
+        - name: user_id
+          in: query
+          type: string
+          description: 'required (int or array)'
+      tags:
+        - User
+      responses:
+        "200":
+          schema: '{}'
+  /api/v1/user/contacts:
+    post:
+      summary: Contact list
+      description: Get users list
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"api_token": "xxx"}'
+        - name: api_token
+          in: query
+          type: string
+          description: 'required'
+      tags:
+        - User
+      responses:
+        "200":
+          schema:
+            $ref: '#/definitions/UserContacts'
+  /api/v1/user/add_favorite:
+    post:
+      summary: Add user to favorite
+      description: Add user to favorite list
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"api_token": "xxx", "user_id": [15,25,31]}'
+        - name: api_token
+          in: query
+          type: string
+          description: 'required'
+        - name: user_id
+          in: query
+          type: string
+          description: 'required (int or array)'
+      tags:
+        - User
+      responses:
+        "200":
+          schema: '{}'
+  /api/v1/user/delete_favorite:
+    post:
+      summary: Delete user from
+      description: Delete user from the favorite list
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"api_token": "xxx", "user_id": [15,25,31]}'
+        - name: api_token
+          in: query
+          type: string
+          description: 'required'
+        - name: user_id
+          in: query
+          type: string
+          description: 'required (int or array)'
+      tags:
+        - User
+      responses:
+        "200":
+          schema: '{}'
+  /api/v1/user/favorites:
+    post:
+      summary: Favorites list
+      description: Get favorite users list
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"api_token": "xxx"}'
+        - name: api_token
+          in: query
+          type: string
+          description: 'required'
+      tags:
+        - User
+      responses:
+        "200":
+          schema:
+            $ref: '#/definitions/UserFavorites'
+  /api/v1/user/messages:
+    post:
+      summary: User messages from concrete user
+      description: Get user messages
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"id_from": "123", "offset": "0", "limit": 100}'
+        - name: api_token
+          in: query
+          type: string
+          description: 'required'
+        - name: id_from
+          in: query
+          type: integer
+          description: 'required'
+        - name: offset
+          in: query
+          type: string
+        - name: limit
+          in: query
+          type: string
+      tags:
+        - User
+      responses:
+        "200":
+          schema:
+            $ref: '#/definitions/UserContacts'
+  /api/v1/user/check_update:
+    post:
+      summary: Check Application Updates
+      description: Check Application Updates
+      parameters:
+        - name: api_token
+          in: query
+          type: string
+          required: false
+          description: 'API token'
+        - name: Application-Name
+          in: header
+          type: string
+          required: true
+          description: 'Application-Name:SideBarApp'
+          default: 'SideBarApp'
+        - name: Application-Version
+          in: header
+          type: string
+          required: true
+          description: 'Application-Version:1.0.1'
+          default: '1'
+        - name: Device-Platform
+          in: header
+          type: string
+          required: true
+          description: 'Device-Platform:iOS'
+          default: 'iOS'
+      tags:
+        - User
+      responses:
+        "200":
+          schema:
+            $ref: '#/definitions/UserUpdates'
+  /api/v1/user/files:
+    post:
+      summary: Get user files by api_token
+      description:
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"api_token":"sFGb8Gasfgelgew"}'
+        - name: api_token
+          in: query
+          type: string
+          description: 'required'
+      tags:
+        - User
+      responses:
+        "200":
+          description: api token of the user
+          schema:
+            $ref: '#/definitions/UserFiles'
+  /api/v1/user/delete:
+    post:
+      summary: Get user files by api_token
+      description:
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"api_token":"sFGb8Gasfgelgew"}'
+        - name: api_token
+          in: query
+          type: string
+          description: 'required'
+      tags:
+        - User
+      responses:
+        "200":
+          description: api token of the user
+          schema: '{}'
+  /api/v1/upload/send:
+    post:
+      summary: Send file to the server
+      parameters:
+        - name: file
+          in: formData
+          type: file
+          required: true
+          description: 'file to upload'
+        - name: api_token
+          in: query
+          type: string
+          required: true
+      tags:
+        - Upload
+      responses:
+        "200":
+          description: api token of the user
+          schema:
+            $ref: '#/definitions/UploadedFile'
+  /api/v1/upload/save_files:
+    post:
+      summary: Save uploaded files to the server for the current user
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"api_token":"sFGb8Gasfgelgew", "file_ids": [2,3,15]}'
+        - name: api_token
+          in: query
+          type: string
+          description: 'required'
+        - name: file_ids
+          in: query
+          type: array
+          description: 'required (or urls)'
+        - name: file_urls
+          in: query
+          type: array
+          description: 'required (or ids)'
+      tags:
+        - Upload
+      responses:
+        "200":
+          description: returns empty object in "data"
+          schema:
+            $ref: '#/definitions/SavedFile'
+  /api/v1/user/client_error_callback:
+    post:
+      summary: Server request to fix client error
+      description: You can set any data in json body and it will send to developer's emails
+      parameters:
+        - name: body
+          in: body
+          type: string
+          required: true
+          description: 'example: {"any_params":"any_values"}'
+      tags:
+        - User
+      responses:
+        "200":
+          schema: '{}'
+  /authorize:
+    get:
+      summary: Authorize user
+      description: 'request: {"command": "authorize", "data": {"api_token": "xxx"}} response: {"command": "authorized", "data": {"value": true}}'
+      tags:
+        - Sockets
+  /message:
+    get:
+      summary: Send message to another user or chat room
+      description: 'request: {"command": "message", "data": {"id_to_user|id_to_chat": "94", "message": "hello"}} response: {"command": "message_sent", data: {"ok": true}} response2: {"command": "receive_message", "data": {"message": "sended message by another user", "id_from": 80}}'
+      tags:
+        - Sockets
+  /update_message:
+    get:
+      summary: Update your own message
+      description: 'request: {"command": "update_message", "data": {"message_id": "1234", "message": "hello"}} response: {"command": "message_updated", data: {...}} response2: {"command": "update_message", "data": {...}}'
+      tags:
+        - Sockets
+  /create_chat_room:
+    get:
+      summary: Create chat room
+      description: 'request: {"command": "create_chat_room", "data": {"user_ids": [17,18,19], "title": "test title"}} response: {"data": {"ident": 7, "ok": true}, "command": "room_created"}'
+      tags:
+        - Sockets
+  /add_user_to_chat:
+    get:
+      summary: Add users to created chat, only chat creator can
+      description: 'request: {"command": "add_user_to_chat", "data": {"chat_id": 7, "user_ids": [53,54,55,1111]}} response: {"data": {"ok": true}, "command": "users_added"}'
+      tags:
+        - Sockets
+  /del_user_from_chat:
+    get:
+      summary: Delete user from created chat
+      description: 'request: {"command": "del_user_from_chat", "data": {"chat_id": 7, "user_ids": [17,18]}} response: {"data": {"ok": true}, "command": "users_deleted"}'
+      tags:
+        - Sockets
+  /del_chat_room:
+    get:
+      summary: Delete chat room, only chat creator can
+      description: 'request: {"command": "del_chat_room", "data": {"chat_id": 7}} response: {"data": {"ok": true}, "command": "chat_deleted"}'
+      tags:
+        - Sockets
+definitions:
+  User:
+    properties:
+      ident:
+        type: integer
+        description: Unique user identified
+      first_name:
+        type: string
+        description: user first name
+      last_name:
+        type: string
+        description: user last name
+  UserContact:
+    properties:
+      ident:
+        type: integer
+        description: Unique user identified
+      first_name:
+        type: string
+        description: user first name
+      last_name:
+        type: string
+        description: user last name
+      photo:
+        type: string
+        description: user avatar
+  UserFavorite:
+    properties:
+      ident:
+        type: integer
+        description: Unique user identified
+      first_name:
+        type: string
+        description: user first name
+      last_name:
+        type: string
+        description: user last name
+      photo:
+        type: string
+        description: user avatar
+  UserMessage:
+    properties:
+      ident:
+        type: integer
+        description: Unique message identified
+      message:
+        type: string
+        description: message text
+      created_at:
+        type: string
+  UserUpdate:
+    properties:
+      description:
+        type: string
+        description: Update description
+      date:
+        type: string
+        description: Update date realeas
+      version:
+        type: string
+        description: Version
+      required:
+        type: boolean
+        description: Required update
+  UserData:
+    properties:
+      api_token:
+        type: string
+      email:
+        type: string
+      ident:
+        type: integer
+      friendsCount:
+        type: integer
+      photo:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+  UploadedFile:
+    properties:
+      ident:
+        type: integer
+      file:
+        type: string
+      hash:
+        type: string
+  UserFile:
+    properties:
+      ident:
+        type: integer
+      created_at:
+        type: string
+      file:
+        type: string
+  SavedFile:
+    properties:
+      uploaded_count:
+        type: integer
+  UserFiles:
+    type: array
+    items:
+      $ref: UserFile
+  UserContacts:
+    type: array
+    items:
+      $ref: UserContact
+  UserFavorites:
+    type: array
+    items:
+      $ref: UserFavorite
+  UserMessages:
+    type: array
+    items:
+      $ref: UserMessage
+  UserUpdates:
+    properties:
+      release:
+        $ref: UserUpdate
