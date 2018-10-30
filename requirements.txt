@@ -61,7 +61,7 @@ python-twitter==3.2
 python3-openid==3.0.10
 pytz==2016.7
 PyYAML==3.11
-requests==2.10.0
+requests==2.20.0
 requests-oauthlib==0.7.0
 simplejson==3.10.0
 six==1.10.0
