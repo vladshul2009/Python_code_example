@@ -27,7 +27,7 @@ hiredis==0.2.0
 idna==2.1
 imagesize==0.7.1
 inflection==0.3.1
-Jinja2==2.8
+Jinja2~>2.10.1
 jsonpatch==1.10
 jsonpointer==1.10
 language-selector==0.1
